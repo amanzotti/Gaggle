@@ -118,6 +118,24 @@ class preprocess(BaseEstimator, TransformerMixin):
     def transform(self, df):
         """The workhorse of this feature extractor"""
         _df = df.copy()
+        _df['Age'] = _df['YrSold'] - _df['YearBuilt']
+        _df['AgeRemod'] = _df['YrSold'] - _df['YearRemodAdd']
+        _df['Baths'] = _df['FullBath'] + _df['HalfBath']
+        _df['BsmtBaths'] = _df['BsmtFullBath'] + _df['BsmtHalfBath']
+        _df['OverallQual_Square'] = _df['OverallQual'] * _df['OverallQual']
+        _df['OverallQual_3'] = _df['OverallQual'] * _df['OverallQual'] * _df['OverallQual']
+        _df['OverallQual_exp'] = np.exp(_df['OverallQual'])
+        _df['GrLivArea_Square'] = _df['GrLivArea'] * _df['GrLivArea']
+        _df['GrLivArea_3'] = _df['GrLivArea'] * _df['GrLivArea'] * _df['GrLivArea']
+        _df['GrLivArea_exp'] = np.exp(_df['GrLivArea'])
+        _df['GrLivArea_log'] = np.log(_df['GrLivArea'])
+        _df['TotalBsmtSF_/GrLivArea'] = _df['TotalBsmtSF'] / _df['GrLivArea']
+        _df['OverallCond_sqrt'] = np.sqrt(_df['OverallCond'])
+        _df['OverallCond_square'] = _df['OverallCond'] * _df['OverallCond']
+        _df['LotArea_sqrt'] = np.sqrt(_df['LotArea'])
+        _df['1stFlrSF_log'] = np.log1p(_df['1stFlrSF'])
+        _df['1stFlrSF'] = np.sqrt(_df['1stFlrSF'])
+        _df['TotRmsAbvGrd_sqrt'] = np.sqrt(_df['TotRmsAbvGrd'])
         categorical = self.find_categorical(df)
         numerical = self.find_numerical(df)
 
@@ -133,9 +151,8 @@ class preprocess(BaseEstimator, TransformerMixin):
         skewed_feats = skewed_feats[skewed_feats > 0.75]
         skewed_feats = skewed_feats.index
         _df[skewed_feats] = np.log1p(_df[skewed_feats])
-
-        num_matrix = StandardScaler().fit_transform(np.asarray(_df[numerical]))
         cat_matrix = pd.get_dummies(_df[categorical]).as_matrix()
+        num_matrix = StandardScaler().fit_transform(np.asarray(_df[numerical]))
 
         return np.hstack((num_matrix, cat_matrix))
 

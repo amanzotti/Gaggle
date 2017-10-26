@@ -16,12 +16,14 @@ from sklearn.kernel_ridge import KernelRidge
 
 from sklearn.metrics import mean_squared_error
 import sklearn.ensemble
+from sklearn.ensemble import ExtraTreesRegressor, RandomForestRegressor, GradientBoostingRegressor
 
 import warnings
 warnings.filterwarnings("ignore")
 
 pre = utils.preprocess()
 data = pd.read_csv('./train.csv')
+data = data.drop(1298)
 feat = data.drop('SalePrice', 1)
 target = np.asarray(np.log(data.SalePrice))
 clf = sklearn.linear_model.Ridge(alpha=4.)
@@ -30,19 +32,26 @@ clf = sklearn.linear_model.Ridge(alpha=4.)
 # print(pre.transform(feat))
 
 # sys.exit()
+# name = 'ridge'
 
 # model = sklearn.linear_model.Ridge()
-# param_grid = dict(clf__alpha=np.logspace(-4, 1.2, 500))
+# param_grid = dict(clf__alpha=np.logspace(-4, 0., 600))
 
 # model = sklearn.svm.SVR(kernel='linear')
 # param_grid = dict(clf__C=np.linspace(0.1, 4, 20))
 
+name = 'gbr'
+model = GradientBoostingRegressor()
+param_grid = {'clf__max_features':[.05, .1, .2], 'clf__n_estimators':[5000, 8000,6000],
+             'clf__learning_rate':[.01,0.005], 'clf__max_depth': [2]}
 
-name = 'kernel_ridge'
 
-model = KernelRidge(kernel='rbf')
-param_grid = {"clf__alpha": np.logspace(-4, 1.2, 40),
-              "clf__gamma": np.logspace(-3, 1, 5)}
+
+# name = 'kernel_ridge'
+
+# model = KernelRidge(kernel='rbf')
+# param_grid = {"clf__alpha": np.logspace(-4, 1.2, 40),
+#               "clf__gamma": np.logspace(-3, 1, 5)}
 
 
 
